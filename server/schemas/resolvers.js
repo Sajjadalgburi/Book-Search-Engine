@@ -1,4 +1,5 @@
 const User = require('../models');
+const { AuthenticationError } = require('../utils/auth');
 
 // Defining resolvers for GraphQL queries
 const resolvers = {
@@ -15,9 +16,11 @@ const resolvers = {
 
     // Resolver for fetching the current authenticated user
     me: async (parent, args, context) => {
-      return context.user
-        ? await User.findOne({ _id: context.user._id }) // Finding the current user by their ID
-        : false; // (IMPLEMENT custom error message here)
+      if (context.user) {
+        return await User.findOne({ _id: context.user._id }); // Finding the current user by their ID
+      }
+
+      throw AuthenticationError;
     },
   },
 };
