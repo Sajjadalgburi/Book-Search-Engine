@@ -4,6 +4,9 @@ const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const path = require('path');
 
+// custom auth middleware
+const { authMiddleware } = require('./utils/auth');
+
 // Import GraphQL schema and database configuration
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
@@ -32,7 +35,12 @@ const startApolloServer = async () => {
   app.use(express.json());
 
   // Mount Apollo middleware at the /graphql endpoint
-  app.use('/graphql', expressMiddleware(server));
+  app.use(
+    '/graphql',
+    expressMiddleware(server, {
+      context: authMiddleware, // using our custom auth middleware as context
+    })
+  );
 
   // Serve client/dist directory as static assets in production
   if (process.env.NODE_ENV === 'production') {
