@@ -60,6 +60,26 @@ const resolvers = {
       return { user, signToken };
     },
   },
+
+  saveBook: async (parent, { userId, title }, context) => {
+    // Check if user is authenticated
+    if (context.user) {
+      // If authenticated, update user document to add the book to saved books
+      return User.findOneAndUpdate(
+        { _id: userId }, // Find user by userId
+        {
+          $addToSet: { saveBooks: title }, // Add book title to savedBooks array if not already present
+        },
+        {
+          new: true, // Return the modified user document
+          runValidators: true, // Validate the update operation against the schema
+        }
+      );
+    }
+
+    // If user is not authenticated, throw AuthenticationError
+    throw AuthenticationError;
+  },
 };
 
 // Exporting the resolvers
