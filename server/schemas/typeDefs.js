@@ -23,6 +23,15 @@ const typeDefs = gql`
     token: ID! # Authentication token
     singleUser: Users # The user associated with the authentication
   }
+
+  type Mutation {
+    createUser(username: String!, email: String!, password: String!): Auth
+    login(email: String!, password: String!): Auth
+
+    # ! TODO : what does the title need to be ?? does it user User or Book model? Do I save the books title?
+    saveBook(userId: ID!, title: String!): Users
+    deleteBook: Users
+  }
 `;
 
 // Exporting the GraphQL schema
