@@ -30,7 +30,7 @@ const typeDefs = gql`
 
     # ! TODO : what does the title need to be ?? does it user User or Book model? Do I save the books title?
     saveBook(userId: ID!, title: String!): Users
-    deleteBook: Users
+    deleteBook(title: String!): Users
   }
 `;
 
