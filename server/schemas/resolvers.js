@@ -35,6 +35,30 @@ const resolvers = {
       // Return the newly created user object and the JWT token
       return { user, token };
     },
+
+    login: async (parent, { email, password }) => {
+      // Find the user in the database using the provided email
+      const user = await User.findOne({ email });
+
+      // If user is not found, throw an AuthenticationError
+      if (!user) {
+        throw AuthenticationError;
+      }
+
+      // Check if the provided password is correct
+      const correctPsw = await User.isCorrectPassword(password);
+
+      // If password is incorrect, throw an AuthenticationError
+      if (!correctPsw) {
+        throw AuthenticationError;
+      }
+
+      // Generate a JSON Web Token (JWT) for the authenticated user
+      const token = signToken(user);
+
+      // Return the user and the generated token
+      return { user, signToken };
+    },
   },
 };
 
