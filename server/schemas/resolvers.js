@@ -65,7 +65,7 @@ const resolvers = {
     // Check if user is authenticated
     if (context.user) {
       // If authenticated, update user document to add the book to saved books
-      return User.findOneAndUpdate(
+      return await User.findOneAndUpdate(
         { _id: userId }, // Find user by userId
         {
           $addToSet: { saveBooks: title }, // Add book title to savedBooks array if not already present
@@ -78,6 +78,21 @@ const resolvers = {
     }
 
     // If user is not authenticated, throw AuthenticationError
+    throw AuthenticationError;
+  },
+
+  deleteBook: async (parent, { title }, context) => {
+    // Check if the user is authenticated
+    if (context.user) {
+      // If authenticated, delete the book from the user's saved books array
+      return await User.findOneAndDelete(
+        { _id: context.user._id },
+        { $pull: { saveBooks: title } }, // Remove the specified book from the saveBooks array
+        { new: true } // Return the updated user object after deletion
+      );
+    }
+
+    // If user is not authenticated, throw an AuthenticationError
     throw AuthenticationError;
   },
 };
