@@ -1,5 +1,5 @@
 const User = require('../models');
-const { AuthenticationError } = require('../utils/auth');
+const { signToken, AuthenticationError } = require('../utils/auth');
 
 // Defining resolvers for GraphQL queries
 const resolvers = {
@@ -21,6 +21,19 @@ const resolvers = {
       }
 
       throw AuthenticationError;
+    },
+  },
+
+  Mutation: {
+    // Resolver function for creating a new user
+    createUser: async (parent, { username, email, password }) => {
+      const user = await User.create({ username, email, password });
+
+      // Generate a JSON Web Token (JWT) for the newly created user
+      const token = signToken(user);
+
+      // Return the newly created user object and the JWT token
+      return { user, token };
     },
   },
 };
