@@ -14,3 +14,18 @@ export const CREATE_NEW_USER = gql`
     }
   }
 `;
+
+// Define a GraphQL mutation to authenticate and log in a user
+export const LOGIN_USER = gql`
+  mutation login($email: String!, $password: String!) {
+    # Mutation operation to log in a user, taking email and password as arguments
+    login(email: $email, password: $password) {
+      # Return token and user profile information upon successful login
+      token
+      profile {
+        _id
+        name
+      }
+    }
+  }
+`;
