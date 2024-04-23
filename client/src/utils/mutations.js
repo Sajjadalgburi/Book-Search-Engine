@@ -29,3 +29,15 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+// Define a GraphQL mutation to save a book
+export const SAVE_BOOK = gql`
+  mutation saveBook($userId: ID!, $title: String!) {
+    # Call the saveBook mutation with userId and title as parameters
+    saveBook(userId: $userId, title: $title) {
+      # Return the _id and title of the saved book
+      _id
+      title
+    }
+  }
+`;
