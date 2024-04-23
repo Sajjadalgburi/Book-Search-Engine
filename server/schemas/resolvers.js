@@ -1,101 +1,86 @@
 const User = require('../models');
 const { signToken, AuthenticationError } = require('../utils/auth');
 
-// Defining resolvers for GraphQL queries
 const resolvers = {
   Query: {
     // Resolver for fetching all users
     users: async () => {
-      return await User.find(); // Finding all users
+      return await User.find();
     },
-
     // Resolver for fetching a single user by their ID
     singleUser: async (parent, { userId }) => {
-      return await User.findById(userId); // Finding a user by ID
+      return await User.findById(userId);
     },
-
     // Resolver for fetching the current authenticated user
     me: async (parent, args, context) => {
+      // Check if user is authenticated
       if (context.user) {
-        return await User.findOne({ _id: context.user._id }); // Finding the current user by their ID
+        // If authenticated, return the current user
+        return await User.findById(context.user._id);
       }
-
-      throw AuthenticationError;
+      // If not authenticated, throw an AuthenticationError
+      throw new AuthenticationError('You are not authenticated');
     },
   },
-
   Mutation: {
     // Resolver function for creating a new user
     createUser: async (parent, { username, email, password }) => {
+      // Create a new user in the database
       const user = await User.create({ username, email, password });
-
-      // Generate a JSON Web Token (JWT) for the newly created user
+      // Generate a JWT token for the newly created user
       const token = signToken(user);
-
-      // Return the newly created user object and the JWT token
+      // Return the user object and the token
       return { user, token };
     },
-
+    // Resolver function for user login
     login: async (parent, { email, password }) => {
-      // Find the user in the database using the provided email
+      // Find the user by email in the database
       const user = await User.findOne({ email });
-
       // If user is not found, throw an AuthenticationError
       if (!user) {
-        throw AuthenticationError;
+        throw new AuthenticationError('No user found with this email address');
       }
-
       // Check if the provided password is correct
-      const correctPsw = await User.isCorrectPassword(password);
-
+      const correctPsw = await user.isCorrectPassword(password);
       // If password is incorrect, throw an AuthenticationError
       if (!correctPsw) {
-        throw AuthenticationError;
+        throw new AuthenticationError('Incorrect password');
       }
-
-      // Generate a JSON Web Token (JWT) for the authenticated user
+      // Generate a JWT token for the authenticated user
       const token = signToken(user);
-
-      // Return the user and the generated token
-      return { user, signToken };
+      // Return the user object and the token
+      return { user, token };
     },
-  },
-
-  saveBook: async (parent, { userId, title }, context) => {
-    // Check if user is authenticated
-    if (context.user) {
-      // If authenticated, update user document to add the book to saved books
-      return await User.findOneAndUpdate(
-        { _id: userId }, // Find user by userId
-        {
-          $addToSet: { saveBooks: title }, // Add book title to savedBooks array if not already present
-        },
-        {
-          new: true, // Return the modified user document
-          runValidators: true, // Validate the update operation against the schema
-        }
-      );
-    }
-
-    // If user is not authenticated, throw AuthenticationError
-    throw AuthenticationError;
-  },
-
-  deleteBook: async (parent, { title }, context) => {
-    // Check if the user is authenticated
-    if (context.user) {
-      // If authenticated, delete the book from the user's saved books array
-      return await User.findOneAndDelete(
-        { _id: context.user._id },
-        { $pull: { saveBooks: title } }, // Remove the specified book from the saveBooks array
-        { new: true } // Return the updated user object after deletion
-      );
-    }
-
-    // If user is not authenticated, throw an AuthenticationError
-    throw AuthenticationError;
+    // Resolver function for saving a book to user's savedBooks array
+    saveBook: async (parent, { userId, bookInput }, context) => {
+      // Check if user is authenticated
+      if (context.user) {
+        // If authenticated, update the user document to add the book to savedBooks
+        return await User.findOneAndUpdate(
+          { _id: userId }, // Find user by userId
+          { $addToSet: { savedBooks: bookInput } }, // Add bookInput object to savedBooks array
+          { new: true, runValidators: true } // Return the modified user document
+        );
+      }
+      // If user is not authenticated, throw an AuthenticationError
+      throw new AuthenticationError('You must be logged in to save a book.');
+    },
+    // Resolver function for removing a book from user's savedBooks array
+    removeBook: async (parent, { userId, bookId }, context) => {
+      // Check if user is authenticated
+      if (context.user) {
+        // If authenticated, remove the specified book from the user's savedBooks array
+        return await User.findOneAndUpdate(
+          { _id: userId }, // Find user by userId
+          { $pull: { savedBooks: { bookId } } }, // Remove book with specified bookId from savedBooks array
+          { new: true } // Return the modified user document
+        );
+      }
+      // If user is not authenticated, throw an AuthenticationError
+      throw new AuthenticationError('You must be logged in to remove a book.');
+    },
   },
 };
 
-// Exporting the resolvers
+// Export the resolvers
 module.exports = resolvers;
