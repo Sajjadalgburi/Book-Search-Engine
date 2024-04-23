@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3001;
 // Create an Express application
 const app = express();
 
-const { typeDefs, resolvers } = require('./schemas');
+// const { typeDefs, resolvers } = require('./schemas');
 
 // Create an Apollo Server instance
 const server = new ApolloServer({
