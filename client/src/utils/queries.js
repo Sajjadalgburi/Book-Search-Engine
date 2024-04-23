@@ -25,7 +25,7 @@ export const QUERY_SINGLE_USER = gql`
 
 // Define a GraphQL query constant QUERY_ME
 export const QUERY_ME = gql`
-  // Define a GraphQL query named "me"
+  # Define a GraphQL query named "me"
   query me {
     # Request fields for the currently authenticated user
     me {
