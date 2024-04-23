@@ -1,38 +1,49 @@
 const gql = require('graphql-tag');
 
-// Defining the GraphQL schema using gql template literal
 const typeDefs = gql`
-  # Defining the 'Users' type with fields
-  type Users {
+  type User {
     _id: ID
     username: String
     email: String
-    password: String
-    savedBooks: [String]! # Array of strings representing saved books
+    bookCount: Int
+    savedBooks: [Book]!
   }
 
-  # Defining the queries available in the schema
-  type Query {
-    users: [Users]! # Query to retrieve all users
-    singleUser(userId: ID!): Users # Query to retrieve a single user by ID
-    me: Users # Query to retrieve the authenticated user
+  type Book {
+    bookId: ID!
+    authors: [String]!
+    description: String!
+    title: String!
+    image: String
+    link: String
   }
 
-  # Defining the authentication response type
   type Auth {
-    token: ID! # Authentication token
-    singleUser: Users # The user associated with the authentication
+    token: ID!
+    user: User
+  }
+
+  type Query {
+    users: [User]!
+    singleUser(userId: ID!): User
+    me: User
   }
 
   type Mutation {
     createUser(username: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
+    saveBook(userId: ID!, bookInput: BookInput!): User
+    removeBook(userId: ID!, bookId: ID!): User
+  }
 
-    # ! TODO : what does the title need to be ?? does it user User or Book model? Do I save the books title?
-    saveBook(userId: ID!, title: String!): Users
-    deleteBook(title: String!): Users
+  input BookInput {
+    bookId: ID!
+    authors: [String]!
+    description: String!
+    title: String!
+    image: String
+    link: String
   }
 `;
 
-// Exporting the GraphQL schema
 module.exports = typeDefs;
