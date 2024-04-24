@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 // Define a GraphQL mutation to create a new user
 export const CREATE_NEW_USER = gql`
   mutation createUser($username: String!, $email: String!, $password: String!) {
-    #Mutation operation to create a user, taking username, email, and password as arguments
+    # Mutation operation to create a user, taking username, email, and password as arguments
     createUser(username: $username, email: $email, password: $password) {
       token
       user {
@@ -20,11 +20,11 @@ export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
     # Mutation operation to log in a user, taking email and password as arguments
     login(email: $email, password: $password) {
-      # Return token and user profile information upon successful login
+      # Return token and user  information upon successful login
       token
-      profile {
+      user {
         _id
-        name
+        username
       }
     }
   }
@@ -32,10 +32,8 @@ export const LOGIN_USER = gql`
 
 // Define a GraphQL mutation to save a book
 export const SAVE_BOOK = gql`
-  mutation saveBook($userId: ID!, $title: String!) {
-    # Call the saveBook mutation with userId and title as parameters
-    saveBook(userId: $userId, title: $title) {
-      # Return the _id and title of the saved book
+  mutation saveBook($userId: ID!, $bookInput: BookInput!) {
+    saveBook(userId: $userId, bookInput: $bookInput) {
       _id
       title
     }
