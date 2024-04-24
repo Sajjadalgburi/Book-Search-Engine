@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { createUser } from '../utils/API';
 import Auth from '../utils/auth';
 import { CREATE_NEW_USER } from '../utils/mutations';
 import { useMutation } from '@apollo/client';
@@ -13,12 +11,13 @@ const SignupForm = () => {
     email: '',
     password: '',
   });
+
   // set state for form validation
-  const [validated] = useState(false);
+  const [validated, setValidated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
 
-  const [createNewUserMutation, { error }] = useMutation(CREATE_NEW_USER);
+  const [createUser, { error }] = useMutation(CREATE_NEW_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -27,34 +26,33 @@ const SignupForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
-    // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
 
     try {
-      const response = await createUser(userFormData);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
+      if (form.checkValidity() === false) {
+        event.stopPropagation();
+        setValidated(true);
+        return;
       }
+      console.log(userFormData);
+      const { data } = await createUser({
+        variables: { ...userFormData },
+      });
 
-      const { token, user } = await response.json();
-      console.log(user);
+      const token = data.createUser.token;
       Auth.login(token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
+    // Reset the form state after submission
     setUserFormData({
       username: '',
       email: '',
       password: '',
     });
+    setValidated(false);
   };
 
   return (
@@ -115,17 +113,7 @@ const SignupForm = () => {
             Password is required!
           </Form.Control.Feedback>
         </Form.Group>
-        <Button
-          disabled={
-            !(
-              userFormData.username &&
-              userFormData.email &&
-              userFormData.password
-            )
-          }
-          type="submit"
-          variant="success"
-        >
+        <Button type="submit" variant="success">
           Submit
         </Button>
       </Form>
