@@ -32,19 +32,23 @@ export const LOGIN_USER = gql`
 
 // Define a GraphQL mutation to save a book
 export const SAVE_BOOK = gql`
-  mutation saveBook($userId: ID!, $bookInput: BookInput!) {
-    saveBook(userId: $userId, bookInput: $bookInput) {
+  mutation saveBook($bookInput: BookInput!) {
+    saveBook(bookInput: $bookInput) {
       _id
-      title
+      savedBooks {
+        title
+      }
     }
   }
 `;
 
 export const REMOVE_BOOK = gql`
-  mutation removeBook($userId: ID!, $bookId: ID!) {
-    removeBook(userId: $userId, bookId: $bookId) {
+  mutation removeBook($bookId: ID!) {
+    removeBook(bookId: $bookId) {
       _id
-      bookId
+      savedBooks {
+        bookId
+      }
     }
   }
 `;
