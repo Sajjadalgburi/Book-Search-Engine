@@ -6,7 +6,7 @@ const typeDefs = gql`
     username: String
     email: String
     bookCount: Int
-    savedBooks: [Book]!
+    savedBooks: [Book]
   }
 
   type Book {
@@ -39,8 +39,8 @@ const typeDefs = gql`
   type Mutation {
     createUser(username: String!, email: String!, password: String!): Auth
     login(email: String!, password: String!): Auth
-    saveBook(userId: ID!, bookInput: BookInput!): User
-    removeBook(userId: ID!, bookId: ID!): User
+    saveBook(bookInput: BookInput!): User
+    removeBook(bookId: ID!): User
   }
 `;
 
