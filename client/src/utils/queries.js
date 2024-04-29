@@ -7,7 +7,9 @@ export const QUERY_USERS = gql`
     # Fetch the _id, username, and savedBooks fields for all users
     _id
     username
-    savedBooks
+    savedBooks {
+      bookId
+    }
   }
 `;
 
@@ -18,7 +20,9 @@ export const QUERY_SINGLE_USER = gql`
     singleUser(userId: $userId) {
       _id
       username
-      savedBooks
+      savedBooks {
+        bookId
+      }
     }
   }
 `;
@@ -31,7 +35,9 @@ export const QUERY_ME = gql`
     me {
       _id
       username
-      savedBooks
+      savedBooks {
+        bookId
+      }
     }
   }
 `;
